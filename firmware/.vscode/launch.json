@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug (OpenOCD + ST-Link)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "cwd": "${workspaceFolder}",
+      "executable": "build/smart-barbell-clip-fw.elf",
+      "configFiles": [ "interface/stlink.cfg", "target/stm32wbx.cfg" ],
+      "openOCDLaunchCommands": [ "reset_config srst_only srst_nogate connect_assert_srst" ],
+      "runToEntryPoint": "main",
+      "svdFile": "${workspaceFolder}/tools/STM32WB55_CM4.svd",
+      "preLaunchTask": "Build"
+    }
+  ]
+}
