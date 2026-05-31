@@ -136,6 +136,10 @@ int main(void)
   display_init();
   display_splash();
 
+  extern TIM_HandleTypeDef htim2;                       /* match your timer */
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 20);     /* ~50% of ARR=39 */
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
   /* I2C bus + sensors */
   extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */
   bsp_i2c_t * i2c = bsp_i2c_create(&hi2c1);
