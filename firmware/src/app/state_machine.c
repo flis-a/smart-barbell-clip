@@ -17,6 +17,9 @@
 #include "main.h"
 #include "stm32wbxx_hal.h"
 
+//SH1106 OLED display driver
+#include "app/display.h"
+
 #define TAG "sm"
 
 #define GREEN_PORT GPIOB
@@ -38,6 +41,11 @@ static state_t  g_state;
 static imu_t  * g_imu;
 static baro_t * g_baro;
 static uint32_t g_cal_entry_ms;
+
+// SH1106 OLED display - last values, for demo purposes
+static float   g_last_qw = 1.0f;
+static int32_t g_last_pa = 0;
+static float   g_last_tc = 0.0f;
 
 /* ---------- Helpers ------------------------------------------------ */
 static void leds_off(void) {
@@ -62,6 +70,7 @@ static void on_entry(state_t s) {
         LOG_INFO("[%s] streaming: IMU 100Hz, baro 25Hz", TAG);
         timer_arm(TIMER_SLOT_IMU,  10, E_IMU_SAMPLE,  true);
         timer_arm(TIMER_SLOT_BARO, 40, E_BARO_SAMPLE, true);
+        timer_arm(TIMER_SLOT_DISPLAY, 200, E_DISPLAY_TICK, true);  /* 5 Hz */
         break;
     case S_ERROR:
         leds_off();
@@ -80,6 +89,7 @@ static void on_exit_s(state_t s) {
     case S_STREAMING:
         timer_stop(TIMER_SLOT_IMU);
         timer_stop(TIMER_SLOT_BARO);
+        timer_stop(TIMER_SLOT_DISPLAY);   // SH1106 OLED update timer
         break;
     default: break;
     }
@@ -148,8 +158,9 @@ void state_machine_dispatch(event_t e) {
         case E_IMU_SAMPLE: {
             float q[4];
             if (imu_read_quat(g_imu, q) == SMARTCLIP_OK) {
+                g_last_qw = q[0];                 /* <-- cache for display */
                 static uint16_t n = 0;
-                if (++n >= 50) {          /* 100 Hz -> log ~2 Hz */
+                if (++n >= 50) {
                     n = 0;
                     LOG_INFO("[%s] q = % .3f % .3f % .3f % .3f",
                              TAG, q[0], q[1], q[2], q[3]);
@@ -160,14 +171,16 @@ void state_machine_dispatch(event_t e) {
         case E_BARO_SAMPLE: {
             int32_t pa; float tc;
             if (baro_read(g_baro, &pa, &tc) == SMARTCLIP_OK) {
+                g_last_pa = pa; g_last_tc = tc;    /* <-- cache for display */
                 static uint8_t n = 0;
-                if (++n >= 25) {          /* 25 Hz -> log ~1 Hz */
-                    n = 0;
-                    LOG_INFO("[%s] baro %ld Pa, %.1f C", TAG, (long)pa, (double)tc);
-                }
+                if (++n >= 25) { n = 0; LOG_INFO("[%s] baro %ld Pa, %.1f C",
+                                                 TAG, (long)pa, (double)tc); }
             }
             break;
         }
+        case E_DISPLAY_TICK:
+            display_status(g_last_qw, g_last_pa, g_last_tc);
+            break;
         default: break;
         }
         break;
