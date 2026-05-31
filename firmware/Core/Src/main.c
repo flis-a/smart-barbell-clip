@@ -32,6 +32,9 @@
 #include "app/timers.h"
 #include "app/state_machine.h"
 #include "app/log.h"
+#include "bsp/bsp_i2c.h"
+#include "drivers/imu.h"
+#include "drivers/baro.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -122,7 +125,21 @@ int main(void)
   log_init();
   evq_init();
   timers_init();
-  state_machine_init();
+
+  /* I2C bus + sensors */
+  extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */
+  bsp_i2c_t * i2c = bsp_i2c_create(&hi2c1);
+
+  size_t  n_found = 0;
+  uint8_t addrs[8];
+  bsp_i2c_scan(i2c, addrs, sizeof(addrs), &n_found);  /* logs each ACK */
+
+  imu_cfg_t  imu_cfg  = { .bus = i2c, .addr_7bit = 0x28 };
+  baro_cfg_t baro_cfg = { .bus = i2c, .addr_7bit = 0x77 };
+  imu_t  * imu  = imu_create(&imu_cfg);
+  baro_t * baro = baro_create(&baro_cfg);
+
+  state_machine_init(imu, baro);
 
   LOG_INFO("boot complete, entering main loop");
   /* USER CODE END 2 */
