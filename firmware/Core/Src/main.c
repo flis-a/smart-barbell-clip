@@ -28,7 +28,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "app/event_queue.h"
+#include "app/timers.h"
+#include "app/state_machine.h"
+#include "app/log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,13 +113,18 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
   MX_I2C1_Init();
   MX_RNG_Init();
   MX_RTC_Init();
+  MX_USART1_UART_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
+  log_init();
+  evq_init();
+  timers_init();
+  state_machine_init();
 
+  LOG_INFO("boot complete, entering main loop");
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
@@ -126,11 +134,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
     /* USER CODE END WHILE */
     MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
+    event_t e;
+    while (evq_pop(&e)) state_machine_dispatch(e);
+    __WFI();
   }
   /* USER CODE END 3 */
 }

@@ -112,14 +112,19 @@ set(WPAN_BLE_CORE_SOURCES
     third_party/cube-wb/Middlewares/ST/STM32_WPAN/ble/svc/Src/svc_ctl.c
 )
  
+set(BNO055_SENSORAPI_SOURCES
+    third_party/bno055-sensorapi/bno055.c
+)
+
 add_executable(${PROJECT_NAME}.elf
     ${HAL_SOURCES}
     ${CORE_SOURCES}
     ${WPAN_SOURCES}
-    ${WPAN_BLE_CORE_SOURCES}        # NEW
-    ${WPAN_TL_SOURCES}              # NEW
-    ${WPAN_UTIL_SOURCES}            # NEW
-    ${STM32_UTIL_SOURCES}           # NEW
+    ${WPAN_BLE_CORE_SOURCES}
+    ${WPAN_TL_SOURCES}
+    ${WPAN_UTIL_SOURCES}
+    ${STM32_UTIL_SOURCES}
+    ${BNO055_SENSORAPI_SOURCES} 
     ${APP_SOURCES}
     ${BOARD_STARTUP_SOURCE}
 )
@@ -147,6 +152,8 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
 
     third_party/cube-wb/Middlewares/ST/STM32_WPAN/ble/svc/Inc
     third_party/cube-wb/Middlewares/ST/STM32_WPAN/ble/svc/Src
+
+    third_party/bno055-sensorapi
 )
  
 target_compile_definitions(${PROJECT_NAME}.elf PRIVATE

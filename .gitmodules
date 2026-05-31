@@ -1,0 +1,3 @@
+[submodule "firmware/third_party/bno055-sensorapi"]
+	path = firmware/third_party/bno055-sensorapi
+	url = https://github.com/boschsensortec/BNO055_SensorAPI
