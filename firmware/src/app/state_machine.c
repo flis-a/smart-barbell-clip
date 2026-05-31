@@ -43,7 +43,7 @@ static baro_t * g_baro;
 static uint32_t g_cal_entry_ms;
 
 // SH1106 OLED display - last values, for demo purposes
-static float   g_last_qw = 1.0f;
+static float   g_last_q[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 static int32_t g_last_pa = 0;
 static float   g_last_tc = 0.0f;
 
@@ -158,7 +158,8 @@ void state_machine_dispatch(event_t e) {
         case E_IMU_SAMPLE: {
             float q[4];
             if (imu_read_quat(g_imu, q) == SMARTCLIP_OK) {
-                g_last_qw = q[0];                 /* <-- cache for display */
+                g_last_q[0] = q[0]; g_last_q[1] = q[1];         // For OLED Debug Screen
+                g_last_q[2] = q[2]; g_last_q[3] = q[3];
                 static uint16_t n = 0;
                 if (++n >= 50) {
                     n = 0;
@@ -179,7 +180,8 @@ void state_machine_dispatch(event_t e) {
             break;
         }
         case E_DISPLAY_TICK:
-            display_status(g_last_qw, g_last_pa, g_last_tc);
+            display_status(g_last_q, g_last_pa, g_last_tc,
+                           BLE_DISCONNECTED, 0);
             break;
         default: break;
         }

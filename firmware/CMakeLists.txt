@@ -56,6 +56,8 @@ endforeach()
  
 file(GLOB_RECURSE CORE_SOURCES
     Core/Src/*.c
+    Core/Src/tim.c
+    Core/Src/dma.c 
 )
  
 file(GLOB_RECURSE WPAN_SOURCES

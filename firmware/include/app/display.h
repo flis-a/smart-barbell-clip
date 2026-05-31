@@ -4,8 +4,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool display_init   (void);                /* false if OLED not on the bus */
-void display_splash (void);                /* draw the bitmap splash       */
-void display_status (float qw, int32_t pressure_pa, float temp_c);
+typedef enum {
+    BLE_DISCONNECTED = 0,
+    BLE_CONNECTED,
+} ble_state_t;
+
+bool display_init   (void);
+void display_splash (void);
+void display_status (const float q[4], int32_t pressure_pa, float temp_c,
+                     ble_state_t ble, int8_t rssi_dbm);
 
 #endif
