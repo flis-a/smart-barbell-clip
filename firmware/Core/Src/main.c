@@ -35,6 +35,8 @@
 #include "bsp/bsp_i2c.h"
 #include "drivers/imu.h"
 #include "drivers/baro.h"
+
+#include "app/display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -125,6 +127,10 @@ int main(void)
   log_init();
   evq_init();
   timers_init();
+
+  // OLED Display - Splashscreen & Init
+  display_init();
+  display_splash();
 
   /* I2C bus + sensors */
   extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */

@@ -71,6 +71,9 @@ file(GLOB_RECURSE APP_SOURCES
     src/bsp/*.c
 )
 
+#SH1106 OLED display driver sources
+file(GLOB SH1106_SOURCES third_party/sh1106/*.c)
+
 # Transport layer + SHCI - CPU1<->CPU2 communication over IPCC.
 # NOTE: the tl/ folder also contains Zigbee/Thread/802.15.4 variants.
 # List ONLY the BLE-relevant files; do not glob.
@@ -131,8 +134,10 @@ add_executable(${PROJECT_NAME}.elf
     ${STM32_UTIL_SOURCES}
     ${BNO055_SENSORAPI_SOURCES} 
     ${BMP280_EBREZA_SOURCES} 
+    ${SH1106_SOURCES}
     ${APP_SOURCES}
     ${BOARD_STARTUP_SOURCE}
+    include/app/display.h
 )
  
 target_include_directories(${PROJECT_NAME}.elf PRIVATE
@@ -160,7 +165,8 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     third_party/cube-wb/Middlewares/ST/STM32_WPAN/ble/svc/Src
 
     third_party/bno055-sensorapi
-    third_party/bmp280-ebreza/inc   
+    third_party/bmp280-ebreza/inc
+    third_party/sh1106  
 )
  
 target_compile_definitions(${PROJECT_NAME}.elf PRIVATE
