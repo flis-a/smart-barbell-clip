@@ -36,6 +36,7 @@ add_link_options(
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map,--cref
     --specs=nano.specs
     --specs=nosys.specs
+    -u _printf_float          # <-- ADD: pull in nano's float printf
 )
  
 # ---- 4. The executable ----
@@ -116,6 +117,10 @@ set(BNO055_SENSORAPI_SOURCES
     third_party/bno055-sensorapi/bno055.c
 )
 
+set(BMP280_EBREZA_SOURCES 
+    third_party/bmp280-ebreza/src/bmp280.c
+)
+
 add_executable(${PROJECT_NAME}.elf
     ${HAL_SOURCES}
     ${CORE_SOURCES}
@@ -125,6 +130,7 @@ add_executable(${PROJECT_NAME}.elf
     ${WPAN_UTIL_SOURCES}
     ${STM32_UTIL_SOURCES}
     ${BNO055_SENSORAPI_SOURCES} 
+    ${BMP280_EBREZA_SOURCES} 
     ${APP_SOURCES}
     ${BOARD_STARTUP_SOURCE}
 )
@@ -154,6 +160,7 @@ target_include_directories(${PROJECT_NAME}.elf PRIVATE
     third_party/cube-wb/Middlewares/ST/STM32_WPAN/ble/svc/Src
 
     third_party/bno055-sensorapi
+    third_party/bmp280-ebreza/inc   
 )
  
 target_compile_definitions(${PROJECT_NAME}.elf PRIVATE
