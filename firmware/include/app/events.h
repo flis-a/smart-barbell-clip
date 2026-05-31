@@ -18,6 +18,9 @@
     X(CAL_BLINK)              \
     X(IMU_SAMPLE)             \
     X(BARO_SAMPLE)            \
+    X(DISPLAY_TICK)           \
+    X(ANIM_TICK)              \
+    X(ANIM_INTRO_DONE)        \
     X(ALL_OK)                 \
     X(HW_FAULT)               \
     X(BLE_START)              \
