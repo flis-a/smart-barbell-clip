@@ -147,6 +147,14 @@ int main(void)
   for (uint16_t i = 0; i < 24; i++) test_buf[i] = (i & 1u) ? WS_CCR_0 : WS_CCR_1;
   for (uint16_t i = 24; i < TEST_LEN; i++) test_buf[i] = 0;   /* reset gap */
 
+  // WS2812B Test
+  extern TIM_HandleTypeDef htim2;                       /* match your timer */
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 20);     /* ~50% of ARR=39 */
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+  for (uint16_t i = 0; i < 24; i++) test_buf[i] = (i & 1u) ? WS_CCR_0 : WS_CCR_1;
+  for (uint16_t i = 24; i < TEST_LEN; i++) test_buf[i] = 0;   /* reset gap */
+
   /* I2C bus + sensors */
   extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */
   bsp_i2c_t * i2c = bsp_i2c_create(&hi2c1);
