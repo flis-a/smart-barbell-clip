@@ -273,7 +273,7 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 // Test for WS2812Bs
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM1) {                 /* match your timer */
+    if (htim->Instance == TIM2) {                 /* match your timer */
         HAL_TIM_PWM_Stop_DMA(htim, TIM_CHANNEL_1);
     }
 }
