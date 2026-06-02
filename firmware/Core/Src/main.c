@@ -59,8 +59,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-#define WS_CCR_0   26u      /* your scope-tuned values */
-#define WS_CCR_1   51u
+#define WS_CCR_0   13u      /* your scope-tuned values */
+#define WS_CCR_1   26u
 #define TEST_LEN   48u
 static uint16_t test_buf[TEST_LEN];
 /* USER CODE END PV */
