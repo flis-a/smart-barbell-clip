@@ -183,8 +183,7 @@ int main(void)
     static uint32_t t_last = 0;                    /* WS2812 scope test */
     if (HAL_GetTick() - t_last >= 50u) {
         t_last = HAL_GetTick();
-        HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1,
-                              (uint32_t *)test_buf, TEST_LEN);
+        HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)test_buf, TEST_LEN);
     }
 
     __WFI();
