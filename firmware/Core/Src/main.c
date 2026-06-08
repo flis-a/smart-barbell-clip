@@ -37,6 +37,7 @@
 #include "bsp/bsp_i2c.h"
 #include "drivers/imu.h"
 #include "drivers/baro.h"
+#include "drivers/ws2812b.h"
 
 #include "app/display.h"
 /* USER CODE END Includes */
@@ -59,10 +60,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-#define WS_CCR_0   13u      /* your scope-tuned values */
-#define WS_CCR_1   26u
-#define TEST_LEN   48u
-static uint16_t test_buf[TEST_LEN];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,13 +137,13 @@ int main(void)
   display_init();
   display_splash();
 
-  // WS2812B Test
-  extern TIM_HandleTypeDef htim2;                       /* match your timer */
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 20);     /* ~50% of ARR=39 */
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-
-  for (uint16_t i = 0; i < 24; i++) test_buf[i] = (i & 1u) ? WS_CCR_0 : WS_CCR_1;
-  for (uint16_t i = 24; i < TEST_LEN; i++) test_buf[i] = 0;   /* reset gap */
+  /* WS2812B - one LED dummy test */
+extern TIM_HandleTypeDef htim2;
+ws2812_cfg_t led_cfg = { .htim = &htim2, .channel = TIM_CHANNEL_1, .num_leds = 1 };
+ws2812_t * leds = ws2812_create(&led_cfg);
+ws2812_clear(leds);
+ws2812_set_pixel(leds, 0, 0, 40, 0);   /* dim green, GRB */
+ws2812_show(leds);
 
   /* I2C bus + sensors */
   extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */
@@ -179,13 +177,13 @@ int main(void)
     event_t e;
     while (evq_pop(&e)) state_machine_dispatch(e);
 
-    // WS2812B Test
-    static uint32_t t_last = 0;                    /* WS2812 scope test */
-    if (HAL_GetTick() - t_last >= 50u) {
+    static uint32_t t_last = 0;
+    if (HAL_GetTick() - t_last >= 100u) {
         t_last = HAL_GetTick();
-        HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)test_buf, TEST_LEN);
+        ws2812_set_pixel(leds, 0, 0, 40, 0);
+        ws2812_show(leds);
     }
-
+    
     __WFI();
   }
   /* USER CODE END 3 */
@@ -271,12 +269,7 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-// Test for WS2812Bs
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM2) {                 /* match your timer */
-        HAL_TIM_PWM_Stop_DMA(htim, TIM_CHANNEL_1);
-    }
-}
+
 /* USER CODE END 4 */
 
 /**

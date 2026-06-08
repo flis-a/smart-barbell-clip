@@ -35,5 +35,4 @@ void            ws2812_set_pixel(ws2812_t * dev, uint16_t i, uint8_t r, uint8_t 
 void            ws2812_clear   (ws2812_t * dev);
 smartclip_err_t ws2812_show    (ws2812_t * dev);   /* kicks DMA */
 
-
 #endif /* DRIVERS_WS2812B_H */

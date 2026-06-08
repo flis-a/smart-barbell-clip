@@ -73,6 +73,9 @@ file(GLOB_RECURSE APP_SOURCES
     src/bsp/*.c
 )
 
+#WS2812B LED driver sources
+file(GLOB WS2812_SOURCES src/drivers/ws2812b.c)
+
 #SH1106 OLED display driver sources
 file(GLOB SH1106_SOURCES third_party/sh1106/*.c)
 
@@ -136,6 +139,7 @@ add_executable(${PROJECT_NAME}.elf
     ${STM32_UTIL_SOURCES}
     ${BNO055_SENSORAPI_SOURCES} 
     ${BMP280_EBREZA_SOURCES} 
+    ${WS2812_SOURCES}
     ${SH1106_SOURCES}
     ${APP_SOURCES}
     ${BOARD_STARTUP_SOURCE}
