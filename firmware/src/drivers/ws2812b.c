@@ -30,7 +30,7 @@ struct ws2812 {
     uint32_t            channel;
     uint16_t            num_leds;
     uint16_t            len;        /* num_leds*24 + reset slots */
-    uint16_t            buf[CFG_MAX_LEDS * WS_BITS_PER_LED + WS_RESET_SLOTS];
+    uint32_t            buf[CFG_MAX_LEDS * WS_BITS_PER_LED + WS_RESET_SLOTS];
     volatile bool       busy;
     bool                in_use;
 };
@@ -39,7 +39,7 @@ static struct ws2812   g_pool[CFG_MAX_WS2812];
 static struct ws2812 * s_active = NULL;   /* for the DMA-complete callback */
 
 /* One color byte -> 8 CCR values, MSB first. */
-static void encode_byte(uint16_t * dst, uint8_t byte) {
+static void encode_byte(uint32_t * dst, uint8_t byte) {
     for (int bit = 7; bit >= 0; --bit)
         *dst++ = (byte & (1u << bit)) ? WS_CCR_1 : WS_CCR_0;
 }
@@ -71,7 +71,7 @@ ws2812_t * ws2812_create(const ws2812_cfg_t * cfg) {
 
 void ws2812_set_pixel(ws2812_t * d, uint16_t i, uint8_t r, uint8_t g, uint8_t b) {
     ASSERT(d != NULL && i < d->num_leds);
-    uint16_t * base = &d->buf[i * WS_BITS_PER_LED];
+    uint32_t * base = &d->buf[i * WS_BITS_PER_LED];
     encode_byte(base + 0,  g);    /* GRB order! */
     encode_byte(base + 8,  r);
     encode_byte(base + 16, b);
