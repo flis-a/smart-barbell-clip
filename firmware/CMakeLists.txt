@@ -144,6 +144,7 @@ add_executable(${PROJECT_NAME}.elf
     ${APP_SOURCES}
     ${BOARD_STARTUP_SOURCE}
     include/app/display.h
+    src/app/animation.c
 )
  
 target_include_directories(${PROJECT_NAME}.elf PRIVATE
