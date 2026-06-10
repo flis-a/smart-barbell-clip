@@ -177,15 +177,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     event_t e;
-    while (evq_pop(&e)) state_machine_dispatch(e);
-
-    static uint32_t t_last = 0;
-    if (HAL_GetTick() - t_last >= 100u) {
-        t_last = HAL_GetTick();
-        ws2812_set_pixel(leds, 0, 0, 40, 40);
-        ws2812_show(leds);
-    }
-    
+    while (evq_pop(&e)) state_machine_dispatch(e); 
     __WFI();
   }
   /* USER CODE END 3 */
