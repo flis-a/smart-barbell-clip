@@ -13,6 +13,7 @@
 
 #include "drivers/imu.h"
 #include "drivers/baro.h"
+#include "app/animations.h"
 
 #include "main.h"
 #include "stm32wbxx_hal.h"
@@ -59,21 +60,20 @@ static void on_entry(state_t s) {
     switch (s) {
     case S_CALIBRATING:
         g_cal_entry_ms = HAL_GetTick();
-        HAL_GPIO_WritePin(GREEN_PORT, GREEN_PIN, GPIO_PIN_RESET);
         LOG_INFO("[%s] calibrating - tumble the board slowly", TAG);
         timer_arm(TIMER_SLOT_CAL_POLL,  500,          E_IMU_CAL_DONE, true);
         timer_arm(TIMER_SLOT_CAL_BLINK, CAL_BLINK_MS, E_CAL_BLINK,    true);
+        anim_set(ANIM_BREATHE, 0, 0, 80);                 /* breathe blue */
         break;
     case S_STREAMING:
-        HAL_GPIO_WritePin(GREEN_PORT, GREEN_PIN, GPIO_PIN_SET);   /* solid green */
-        HAL_GPIO_WritePin(BLUE_PORT,  BLUE_PIN,  GPIO_PIN_RESET); /* blue off    */
         LOG_INFO("[%s] streaming: IMU 100Hz, baro 25Hz", TAG);
         timer_arm(TIMER_SLOT_IMU,  10, E_IMU_SAMPLE,  true);
         timer_arm(TIMER_SLOT_BARO, 40, E_BARO_SAMPLE, true);
-        timer_arm(TIMER_SLOT_DISPLAY, 200, E_DISPLAY_TICK, true);  /* 5 Hz */
+        timer_arm(TIMER_SLOT_DISPLAY, 200, E_DISPLAY_TICK, true);
+        anim_flash(2, 0, 0, 80, ANIM_SOLID, 80, 30, 0);   /* flash blue x2 -> amber */
         break;
     case S_ERROR:
-        leds_off();
+        anim_set(ANIM_BLINK, 80, 0, 0);                   /* blink red */
         break;
     default: break;
     }
@@ -114,6 +114,8 @@ void state_machine_init(imu_t * imu, baro_t * baro) {
 }
 
 void state_machine_dispatch(event_t e) {
+    if (e.type == E_ANIM_TICK) { anim_tick(); return; }
+
     switch (g_state) {
 
     case S_BOOT:

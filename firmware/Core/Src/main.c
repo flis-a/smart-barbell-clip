@@ -38,6 +38,7 @@
 #include "drivers/imu.h"
 #include "drivers/baro.h"
 #include "drivers/ws2812b.h"
+#include "app/animations.h"
 
 #include "app/display.h"
 /* USER CODE END Includes */
@@ -137,13 +138,13 @@ int main(void)
   display_init();
   display_splash();
 
-  /* WS2812B - one LED dummy test */
-extern TIM_HandleTypeDef htim2;
-ws2812_cfg_t led_cfg = { .htim = &htim2, .channel = TIM_CHANNEL_1, .num_leds = 1 };
-ws2812_t * leds = ws2812_create(&led_cfg);
-ws2812_clear(leds);
-ws2812_set_pixel(leds, 0, 0, 40, 0);   /* dim green, GRB */
-ws2812_show(leds);
+  /* WS2812B strip + animation engine */
+  extern TIM_HandleTypeDef htim2;
+  ws2812_cfg_t led_cfg = { .htim = &htim2, .channel = TIM_CHANNEL_1, .num_leds = 9 };
+  ws2812_t * leds = ws2812_create(&led_cfg);
+  ws2812_clear(leds);
+  ws2812_show(leds);            /* start dark */
+  anim_init(leds, 9);
 
   /* I2C bus + sensors */
   extern I2C_HandleTypeDef hi2c1;                 /* from i2c.c */
@@ -159,6 +160,7 @@ ws2812_show(leds);
   baro_t * baro = baro_create(&baro_cfg);
 
   state_machine_init(imu, baro);
+  timer_arm(TIMER_SLOT_ANIM, 20, E_ANIM_TICK, true);   /* 50 Hz LED engine */
 
   LOG_INFO("boot complete, entering main loop");
   /* USER CODE END 2 */
@@ -175,15 +177,7 @@ ws2812_show(leds);
 
     /* USER CODE BEGIN 3 */
     event_t e;
-    while (evq_pop(&e)) state_machine_dispatch(e);
-
-    static uint32_t t_last = 0;
-    if (HAL_GetTick() - t_last >= 100u) {
-        t_last = HAL_GetTick();
-        ws2812_set_pixel(leds, 0, 0, 40, 0);
-        ws2812_show(leds);
-    }
-    
+    while (evq_pop(&e)) state_machine_dispatch(e); 
     __WFI();
   }
   /* USER CODE END 3 */
