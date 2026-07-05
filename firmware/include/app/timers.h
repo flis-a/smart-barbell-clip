@@ -15,13 +15,13 @@ enum {
     TIMER_SLOT_CAL_BLINK = 3,   /* blue LED blink while calibrating   */
 
     /* --- Skeleton: reserved for upcoming sections --- */
-    TIMER_SLOT_DISPLAY   = 4,   /* OLED dirty-flush refresh (6.11)    */
-    TIMER_SLOT_ANIM      = 5,   /* WS2812 animation step (6.12)       */
-    TIMER_SLOT_BATTERY   = 6,   /* battery sample + hysteresis (6.13) */
-    TIMER_SLOT_BLE_ADV   = 7,   /* advertising timeout (6.18)         */
-    TIMER_SLOT_BUTTON    = 8,   /* button long-press detection        */
+    TIMER_SLOT_DISPLAY   = 4,   /* OLED dirty-flush refresh (6.11)         */
+    TIMER_SLOT_ANIM      = 5,   /* WS2812 animation step (6.12)            */
+    TIMER_SLOT_BATTERY   = 6,   /* battery sample + hysteresis (6.14)      */
+    TIMER_SLOT_BLE_ADV   = 7,   /* advertising timeout (6.18)              */
+    TIMER_SLOT_BUTTON    = 8,   /* button poll/debounce + long-press (6.15)*/
 
-    TIMER_POOL_SIZE      = 12,  /* array size; slots 9-11 spare headroom */
+    TIMER_POOL_SIZE      = 12,  /* array size; slots 9-11 spare headroom   */
 };
 
 void            timers_init    (void);
